@@ -102,8 +102,8 @@ def main():
 
     # Validate and get user input for optimizer
     while True:
-        print("\nAvailable Activation Functions:")
-        print(available_activations)
+        print("Available Optimizers:")
+        print(available_optimizers)
         print('Recommended Optimizer: Adam')
         optimizer_choice = input("Enter the optimizer you would like to use: ")
         if optimizer_choice in available_optimizers:
@@ -113,8 +113,8 @@ def main():
 
     # Validate and get user input for activation function
     while True:
-        print("Available Optimizers:")
-        print(available_optimizers)
+        print("\nAvailable Activation Functions:")
+        print(available_activations)
         print('Recommended Activation Function: relu')
         activation_choice = input("Enter the activation function you would like to use: ")
         if activation_choice in available_activations:
@@ -124,7 +124,7 @@ def main():
 
     (train_images, train_labels), (test_images, test_labels) = load_and_preprocess_mnist()
     create_and_train_model(train_images, train_labels, test_images, test_labels, optimizer_choice, activation_choice)
-    model = load_model('mnist_cnn_model.h5')
+    model = load_model(f'mnist_cnn_model{activation_choice}_{optimizer_choice}.h5')
     run_pygame_app(model)
 
 if __name__ == "__main__":
