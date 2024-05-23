@@ -97,6 +97,14 @@ def main():
     create_and_train_model(train_images, train_labels, test_images, test_labels)
     run_pygame_app()
 
+# List all available optimizers in tf.keras.optimizers
+print("Available Optimizers:")
+print(dir(tf.keras.optimizers))
+
+# List all available activation functions in tf.keras.activations
+print("Available Activation Functions:")
+print(dir(tf.keras.activations))
+
 if __name__ == "__main__":
     main()
 
