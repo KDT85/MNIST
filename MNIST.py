@@ -128,4 +128,9 @@ def main():
     run_pygame_app(model)
 
 if __name__ == "__main__":
-    main()
+    while True:
+        try :
+            main()
+        except Exception as e:
+            #print(e)
+            print("\nERROR\nTry a different optimizer or activation function.\n")
