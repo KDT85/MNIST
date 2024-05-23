@@ -5,26 +5,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pygame
 
+# Load and preprocess the MNIST dataset
 def load_and_preprocess_mnist():
     (train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.mnist.load_data()
     train_images = train_images.reshape((60000, 28, 28, 1)).astype('float32') / 255
     test_images = test_images.reshape((10000, 28, 28, 1)).astype('float32') / 255
     return (train_images, train_labels), (test_images, test_labels)
 
-def create_and_train_model(train_images, train_labels, test_images, test_labels):
+# Create and train the model using user-selected optimizer and activation function
+def create_and_train_model(train_images, train_labels, test_images, test_labels, optimizer_choice, activation_choice):
     model = Sequential([
-        Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
+        Conv2D(32, (3, 3), activation=activation_choice, input_shape=(28, 28, 1)),
         MaxPooling2D((2, 2)),
-        Conv2D(64, (3, 3), activation='relu'),
+        Conv2D(64, (3, 3), activation=activation_choice),
         MaxPooling2D((2, 2)),
         Flatten(),
-        Dense(64, activation='relu'),
-        
+        Dense(64, activation=activation_choice),
         Dropout(0.5),
         Dense(10, activation='softmax')
     ])
     
-    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=optimizer_choice, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     history = model.fit(train_images, train_labels, epochs=10, validation_data=(test_images, test_labels))
     model.save('mnist_cnn_model.h5')
     
@@ -39,6 +40,7 @@ def create_and_train_model(train_images, train_labels, test_images, test_labels)
     
     print("Model training complete and saved as 'mnist_cnn_model.h5'")
 
+# Digit prediction function
 def predict_digit(model, image):
     image = pygame.surfarray.array3d(image)
     image = np.mean(image, axis=2)  # Convert to grayscale
@@ -50,7 +52,8 @@ def predict_digit(model, image):
     prediction = model.predict(image)
     return np.argmax(prediction)
 
-def run_pygame_app():
+# Pygame application to interact with the trained model
+def run_pygame_app(model):
     pygame.init()
     window_size = 280
     window = pygame.display.set_mode((window_size, window_size))
@@ -60,8 +63,6 @@ def run_pygame_app():
     last_pos = None
     color = (255, 255, 255)
     radius = 10
-
-    model = load_model('mnist_cnn_model.h5')
 
     running = True
     while running:
@@ -92,19 +93,22 @@ def run_pygame_app():
 
     pygame.quit()
 
+# Main function that integrates user input for configuration
 def main():
+    print("Available Optimizers:")
+    print([opt for opt in dir(tf.keras.optimizers) if not opt.startswith('_')])
+    print("\nAvailable Activation Functions:")
+    print([fn for fn in dir(tf.keras.activations) if callable(getattr(tf.keras.activations, fn))])
+    print('Reccomended Optimizer: Adam')
+    print('Reccomended Activation Function: relu')
+
+    optimizer_choice = input("Enter the optimizer you would like to use: ")
+    activation_choice = input("Enter the activation function you would like to use: ")
+
     (train_images, train_labels), (test_images, test_labels) = load_and_preprocess_mnist()
-    create_and_train_model(train_images, train_labels, test_images, test_labels)
-    run_pygame_app()
-
-# List all available optimizers in tf.keras.optimizers
-print("Available Optimizers:")
-print(dir(tf.keras.optimizers))
-
-# List all available activation functions in tf.keras.activations
-print("Available Activation Functions:")
-print(dir(tf.keras.activations))
+    create_and_train_model(train_images, train_labels, test_images, test_labels, optimizer_choice, activation_choice)
+    model = load_model('mnist_cnn_model.h5')
+    run_pygame_app(model)
 
 if __name__ == "__main__":
     main()
-
