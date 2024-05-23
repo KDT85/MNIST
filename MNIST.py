@@ -27,7 +27,7 @@ def create_and_train_model(train_images, train_labels, test_images, test_labels,
     
     model.compile(optimizer=optimizer_choice, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     history = model.fit(train_images, train_labels, epochs=10, validation_data=(test_images, test_labels))
-    model.save('mnist_cnn_model.h5')
+    model.save(f'mnist_cnn_model{activation_choice}_{optimizer_choice}.h5')
     
     plt.plot(history.history['accuracy'], label='accuracy')
     plt.plot(history.history['val_accuracy'], label='val_accuracy')
@@ -95,15 +95,32 @@ def run_pygame_app(model):
 
 # Main function that integrates user input for configuration
 def main():
-    print("Available Optimizers:")
-    print([opt for opt in dir(tf.keras.optimizers) if not opt.startswith('_')])
-    print("\nAvailable Activation Functions:")
-    print([fn for fn in dir(tf.keras.activations) if callable(getattr(tf.keras.activations, fn))])
-    print('Reccomended Optimizer: Adam')
-    print('Reccomended Activation Function: relu')
 
-    optimizer_choice = input("Enter the optimizer you would like to use: ")
-    activation_choice = input("Enter the activation function you would like to use: ")
+    # List available optimizers and activation functions
+    available_optimizers = [opt for opt in dir(tf.keras.optimizers) if not opt.startswith('_')]
+    available_activations = [fn for fn in dir(tf.keras.activations) if callable(getattr(tf.keras.activations, fn))]
+
+    # Validate and get user input for optimizer
+    while True:
+        print("\nAvailable Activation Functions:")
+        print(available_activations)
+        print('Recommended Optimizer: Adam')
+        optimizer_choice = input("Enter the optimizer you would like to use: ")
+        if optimizer_choice in available_optimizers:
+            break
+        else:
+            print(f"Invalid optimizer. Please choose from the following: {available_optimizers}")
+
+    # Validate and get user input for activation function
+    while True:
+        print("Available Optimizers:")
+        print(available_optimizers)
+        print('Recommended Activation Function: relu')
+        activation_choice = input("Enter the activation function you would like to use: ")
+        if activation_choice in available_activations:
+            break
+        else:
+            print(f"Invalid activation function. Please choose from the following: {available_activations}")
 
     (train_images, train_labels), (test_images, test_labels) = load_and_preprocess_mnist()
     create_and_train_model(train_images, train_labels, test_images, test_labels, optimizer_choice, activation_choice)
